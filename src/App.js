@@ -1,7 +1,15 @@
 import "./App.css";
+import logo from "./img/menu.png";
+
 import React, { useState } from "react";
 import Button from "./button/Button";
-import logo from "./logo/menu.png";
+import {
+  eventDigit,
+  eventFunction,
+  eventOperator,
+  eventResult,
+  checkType,
+} from "./functions";
 
 function App() {
   const [value, setValue] = useState("0");
@@ -41,116 +49,37 @@ function App() {
     const functions = ["AC", "+/-", "%", "mc", "mr", "m-", "m+", ","];
 
     if (!isNaN(content)) {
-      eventDigit(content, operator);
+      eventDigit(content, value, setValue);
     }
 
     if (functions.includes(content)) {
-      eventFunction(content, value, savedValue);
+      eventFunction(
+        content,
+        value,
+        savedValue,
+        setValue,
+        setMemory,
+        setOperator,
+        setSavedValue
+      );
     }
-
+    
     if (operators.includes(content)) {
-      eventOperator(content, operator, value, memory);
+      eventOperator(
+        content,
+        operator,
+        value,
+        memory,
+        setMemory,
+        setValue,
+        setOperator
+      );
       return;
     }
 
     if (content === "=") {
-      eventResult(operator, memory, value);
+      eventResult(operator, memory, value, setValue, setMemory, setOperator);
     }
-  };
-
-  const eventResult = (operator, memory, value) => {
-    if (!operator) return;
-
-    if (operator === "+") {
-      setValue(parseFloat(memory) + parseFloat(value));
-    } else if (operator === "−") {
-      setValue(parseFloat(memory) - parseFloat(value));
-    } else if (operator === "×") {
-      setValue(parseFloat(memory) * parseFloat(value));
-    } else if (operator === "÷") {
-      setValue(parseFloat(memory) / parseFloat(value));
-    }
-    setMemory(null);
-    setOperator(null);
-    return;
-  };
-
-  const eventOperator = (content, operator, value, memory) => {
-    if (operator !== null) {
-      if (operator === "+") {
-        setMemory(parseFloat(memory) + parseFloat(value));
-      } else if (operator === "−") {
-        setMemory(parseFloat(memory) - parseFloat(value));
-      } else if (operator === "×") {
-        setMemory(parseFloat(memory) * parseFloat(value));
-      } else if (operator === "÷") {
-        setMemory(parseFloat(memory) / parseFloat(value));
-      }
-    } else {
-      setMemory(parseFloat(value));
-    }
-    setValue("0");
-    setOperator(content);
-    return;
-  };
-
-  const eventFunction = (content, value, savedValue) => {
-    switch (content) {
-      case "AC":
-        setValue("0");
-        setMemory(null);
-        setOperator(null);
-        return;
-      case "+/-":
-        setValue(value * -1);
-        return;
-      case "%":
-        setValue(value / 100);
-        setMemory(null);
-        setOperator(null);
-        return;
-      case ",":
-        if (value.toString().includes(".")) return;
-        setValue(value + ".");
-        return;
-      case "mc":
-        setSavedValue(0);
-        setValue(0);
-        return;
-      case "mr":
-        setValue(savedValue);
-        return;
-      case "m+":
-        setSavedValue(parseFloat(savedValue) + parseFloat(value));
-        return;
-      case "m-":
-        setSavedValue(parseFloat(savedValue) - parseFloat(value));
-        return;
-      default:
-        break;
-    }
-  };
-
-  const eventDigit = (content) => {
-    if (value !== "0") {
-      const input = value.toString() + content.toString();
-      setValue(input);
-      return;
-    } else {
-      setValue(content);
-      return;
-    }
-  };
-
-  const checkType = (item) => {
-    const operatorStyle = ["−", "+", "×", "÷", "=", "m+"];
-    const functionStale = ["AC", "+/-", "%"];
-
-    if (operatorStyle.includes(item)) {
-      return "operator";
-    } else if (functionStale.includes(item)) {
-      return "function";
-    } else return false;
   };
 
   return (
